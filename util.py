@@ -40,22 +40,32 @@ def drop_messy_data(df, userlist_key):
     return df[(~(df[userlist_key]=='0')) & (~(df[userlist_key]==0)) & (~(df['visitStartTime']==0))]
 
 
-import google.datalab.storage as storage
+# import google.datalab.storage as storage
 from io import BytesIO
+from google.cloud import storage as gcs
 import re
 import pandas as pd
 import pickle
-def _open(gcs_path,return_bucket=False):
+PROJECT_NAME = "ea-grothen"
+def _open(gcs_path,project_name=None,return_bucket=False):
+    # 各名前を取得
+    project_name = PROJECT_NAME if project_name is None else project_name
     extension_name =re.search(r"(\..+)",gcs_path).group()
     bucket_name = re.search(r"gs://(.+?)/",gcs_path).group()
     object_name = re.sub(bucket_name,'',gcs_path)
     bucket_name =re.split(r"//(.+?)/",bucket_name)[1]
-    bucket = storage.Bucket(bucket_name)
-    gcs_object = bucket.object(object_name).read_stream()
+
+    client = gcs.Client(project_name)
+    bucket = client.get_bucket(bucket_name)
+    blob = gcs.Blob(object_name, bucket)
+    content = blob.download_as_string()
+#     bucket = storage.Bucket(bucket_name)
+#     gcs_object = bucket.object(object_name).read_stream()
+    
     if extension_name ==".pkl":
-        result = pickle.load(BytesIO(gcs_object))
+        result = pickle.loads(content)
     elif extension_name == ".csv":
-        result = pd.read_csv(BytesIO(gcs_object))
+        result = pd.read_csv(BytesIO(content))
     if return_bucket:
         return  result, bucket
     return result
