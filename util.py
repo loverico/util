@@ -240,3 +240,24 @@ def ps_load(pkl_names,path="files/"):
             pkls[pkl_name] = pickle.load(f)
         print("loading is done :{}".format(pkl_name))
     return pkls
+
+def ordered_TS(category_name, categories,df,label_name="label"):
+    artificial_time = np.random.permutation(df.index)
+    agg_df = df.loc[artificial_time].groupby(category_name).agg({label_name: ['cumsum', 'cumcount']})
+    ts = agg_df[(label_name, 'cumsum')] / (agg_df[(label_name, 'cumcount')] + 1)
+    return ts
+
+
+from sklearn.model_selection import StratifiedKFold
+def hold_out_TS(category_name, categories, df,n_splits=3,label_name="label"):
+    folds = StratifiedKFold(n_splits=3,shuffle=True, random_state=42)
+    ts = pd.Series(np.empty(df.shape[0]), index=df.index)
+    agg_df = df.groupby(category_name).agg({label_name: ['sum', 'count']})
+    for _, holdout_idx in folds.split(df, df[label_name]):
+        holdout_df = df.iloc[holdout_idx]
+        holdout_agg_df = holdout_df.groupby(category_name).agg({'label': ['sum', 'count']})
+        train_agg_df = agg_df - holdout_agg_df
+        oof_ts = holdout_df.apply(lambda row: train_agg_df.loc[row[category_name]][(label_name, 'sum')] 
+                                  / train_agg_df.loc[row[category_name]][(label_name, 'count')] ,;1 axis=1)
+        ts[oof_ts.index] = oof_ts
+    return ts
