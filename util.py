@@ -249,7 +249,7 @@ def ordered_TS(category_name, categories,df,label_name="label"):
 
 
 from sklearn.model_selection import StratifiedKFold
-def hold_out_TS(category_name, categories, df,n_splits=3,label_name="label"):
+def holdout_TS(category_name, categories, df,n_splits=3,label_name="label"):
     folds = StratifiedKFold(n_splits=3,shuffle=True, random_state=42)
     ts = pd.Series(np.empty(df.shape[0]), index=df.index)
     agg_df = df.groupby(category_name).agg({label_name: ['sum', 'count']})
