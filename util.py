@@ -258,6 +258,6 @@ def holdout_TS(category_name, categories, df,n_splits=3,label_name="label"):
         holdout_agg_df = holdout_df.groupby(category_name).agg({'label': ['sum', 'count']})
         train_agg_df = agg_df - holdout_agg_df
         oof_ts = holdout_df.apply(lambda row: train_agg_df.loc[row[category_name]][(label_name, 'sum')] 
-                                  / train_agg_df.loc[row[category_name]][(label_name, 'count')] ,1 axis=1)
+                                  / train_agg_df.loc[row[category_name]][(label_name, 'count')] , axis=1)
         ts[oof_ts.index] = oof_ts
     return ts
