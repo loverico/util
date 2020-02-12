@@ -261,3 +261,25 @@ def holdout_TS(category_name, categories, df,n_splits=3,label_name="label"):
                                   / train_agg_df.loc[row[category_name]][(label_name, 'count')] , axis=1)
         ts[oof_ts.index] = oof_ts
     return ts
+
+import sklearn.base
+class BHTSNE(sklearn.base.BaseEstimator, sklearn.base.TransformerMixin):
+    
+    def __init__(self, dimensions=2, perplexity=30.0, theta=0.5, rand_seed=-1, max_iter=100):
+
+        self.dimensions = dimensions
+        self.perplexity = perplexity
+        self.theta = theta
+        self.rand_seed = rand_seed
+        self.max_iter = max_iter
+
+    def fit_transform(self, X):
+        import bhtsne
+        return bhtsne.tsne(
+            X.astype(sp.float64),
+            dimensions=self.dimensions,
+            perplexity=self.perplexity,
+            theta=self.theta,
+            rand_seed=self.rand_seed,
+#             max_iter=self.max_iter
+        )
