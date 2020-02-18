@@ -261,7 +261,7 @@ def holdout_TS(category_name, categories, df,n_splits=3,label_name="label"):
                                   / train_agg_df.loc[row[category_name]][(label_name, 'count')] , axis=1)
         ts[oof_ts.index] = oof_ts
     return ts
-
+import scipy as sp
 import sklearn.base
 class BHTSNE(sklearn.base.BaseEstimator, sklearn.base.TransformerMixin):
     
