@@ -284,8 +284,9 @@ class BHTSNE(sklearn.base.BaseEstimator, sklearn.base.TransformerMixin):
 #             max_iter=self.max_iter
         )
 SLACK_NOTIFY_ME="https://hooks.slack.com/services/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"
+import slackweb
 def slack_notify(text="",
     url=SLACK_NOTIFY_ME): 
-import slackweb
+    
     slack = slackweb.Slack(url=url)
     slack.notify(text=text)
